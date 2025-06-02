@@ -1,21 +1,28 @@
 import { DetailedProduct } from "../../components/Products/DetailedProduct";
 import { AppLayout } from "../../components/Layout/AppLayout";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
-interface ProductPageProps {
-  params: {
-    id: string;
-  };
-}
+export default async function ProductPage({
+  params
+}: {
+  params: { id: string }
+}) {
+  const resolvedParams = await params;
 
-export default async function ProductPage({ params }: ProductPageProps) {
-  const response = await fetch(new URL(`/api/products/${params.id}`, process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), {
-    cache: "no-store",
+  const product = await prisma.product.findUnique({
+    where: {
+      id: resolvedParams.id,
+    },
   });
-  const product = await response.json();
+
+  if (!product) {
+    notFound();
+  }
 
   return (
     <AppLayout>
-      <DetailedProduct product={product}/>
+      <DetailedProduct product={product} />
     </AppLayout>
   );
 }

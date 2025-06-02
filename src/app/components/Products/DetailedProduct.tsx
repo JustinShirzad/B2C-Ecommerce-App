@@ -3,7 +3,6 @@
 import { Product } from "@prisma/client";
 import { useState } from "react";
 import Link from "next/link";
-import Image from "next/image";
 
 interface DetailedProductProps {
   product: Product;
@@ -32,7 +31,7 @@ export function DetailedProduct({ product }: DetailedProductProps) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {/* Product Image */}
         <div className="rounded-lg overflow-hidden bg-gray-100 shadow-sm">
-          <Image
+          <img
             src={product.imageUrl || "/placeholder-product.png"}
             alt={product.name}
             className="w-full h-auto object-cover"

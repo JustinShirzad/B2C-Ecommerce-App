@@ -10,7 +10,6 @@ import { prisma } from "@/lib/prisma";
 export default async function Page() {
     const loggedIn = await isLoggedIn();
 
-    // Move OrderList and LogoutButton and to a separate component and use orders API route
     if (loggedIn) {
         const userId = (await cookies()).get('user-id')?.value;
 
@@ -54,7 +53,6 @@ export default async function Page() {
     if (!loggedIn) {
         return (
             <Fragment>
-                <TopMenu />
                 <div className="mt-12 pt-8 max-w-md mx-auto px-4">
                     <LoginForm />
                 </div>

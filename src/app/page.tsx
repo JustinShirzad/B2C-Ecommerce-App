@@ -1,15 +1,17 @@
 import { Main } from "./components/Main";
 import { AppLayout } from "./components/Layout/AppLayout";
+import { prisma } from "@/lib/prisma";
 
 export default async function Page() {
-  const response = await fetch(new URL('/api/products', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), {
-    cache: "no-store",
+  const products = await prisma.product.findMany({
+    orderBy: {
+      createdAt: 'desc'
+    },
   });
-  const product = await response.json();
 
   return (
     <AppLayout>
-      <Main product={product}/>
+      <Main product={products}/>
     </AppLayout>
   );
 }

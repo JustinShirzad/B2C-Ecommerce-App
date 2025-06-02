@@ -1,19 +1,31 @@
 import { Main } from "../../components/Main";
 import { AppLayout } from "../../components/Layout/AppLayout";
+import { prisma } from "@/lib/prisma";
+import { notFound } from "next/navigation";
 
-export default async function Page({ params, }: { params: Promise<{ name: string }>;}) 
-{
-    const response = await fetch(new URL('/api/products', process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'), {
-        cache: "no-store",
+export default async function Page({
+    params
+}: {
+    params: { name: string }
+}) {
+    const categoryName = params.name;
+
+    const products = await prisma.product.findMany({
+        where: {
+            category: categoryName
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
     });
-    const product = await response.json();
-    const { name } = await params;
 
-    const filteredProducts = product.filter((item: { category: string; }) => item.category === name);        
+    if (products.length === 0) {
+        notFound();
+    }
 
     return (
         <AppLayout>
-            <Main product={filteredProducts} />
+            <Main product={products} />
         </AppLayout>
     );
 }

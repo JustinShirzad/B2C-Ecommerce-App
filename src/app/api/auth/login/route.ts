@@ -28,6 +28,7 @@ export async function POST(request: NextRequest) {
 
         const passwordMatch = await bcrypt.compare(password, user.password);
 
+        // REMEMBER: Remove direct comparision later
         if (!passwordMatch && password !== user.password) {
             return NextResponse.json(
                 { error: 'Invalid email or password' },
