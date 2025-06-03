@@ -114,7 +114,6 @@ async function main() {
     }),
   ]);
 
-  // Create users
   const user = await prisma.user.create({
     data: {
       email: 'user@example.com',
@@ -122,9 +121,31 @@ async function main() {
       password: 'password123',
       isAdmin: false,
       cart: {
-        create: {}
+        create: {
+          // Create cart with items directly
+          items: {
+            create: [
+              {
+                productId: products[6].id, // Plant Pot Set
+                quantity: 2,
+              },
+              {
+                productId: products[4].id, // Yoga Mat
+                quantity: 1,
+              }
+            ]
+          }
+        }
       }
     },
+    // Include cart and cart items in the return value
+    include: {
+      cart: {
+        include: {
+          items: true
+        }
+      }
+    }
   });
 
   const admin = await prisma.user.create({

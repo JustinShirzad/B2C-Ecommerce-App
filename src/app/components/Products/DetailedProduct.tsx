@@ -3,18 +3,56 @@
 import { Product } from "@prisma/client";
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 
 interface DetailedProductProps {
   product: Product;
 }
 
 export function DetailedProduct({ product }: DetailedProductProps) {
+  const router = useRouter();
   const [quantity, setQuantity] = useState(1);
+  const [isAddingToCart, setIsAddingToCart] = useState(false);
   const maxQuantity = Math.min(product.stock, 10);
   
-  const handleAddToCart = () => {
-    console.log(`Added ${quantity} of ${product.name} to cart`);
-    // Will implement actual cart functionality later
+  const handleAddToCart = async () => {
+    if (product.stock === 0) return;
+    
+    setIsAddingToCart(true);
+    
+    try {
+      const response = await fetch('/api/cart/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          productId: product.id,
+          quantity: quantity,
+        }),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        
+        // If user is not authenticated, redirect to login
+        if (response.status === 401) {
+          router.push(`/account`);
+          return;
+        }
+        
+        throw new Error(errorData.error || 'Failed to add to cart');
+      }
+      
+      // Success - redirect to cart page
+      router.push('/cart');
+      
+    } catch (error) {
+      console.error('Error adding to cart:', error);
+      alert('There was a problem adding this item to your cart. Please try again.');
+    } finally {
+      setIsAddingToCart(false);
+    }
   };
 
   return (
@@ -92,7 +130,7 @@ export function DetailedProduct({ product }: DetailedProductProps) {
                   className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  disabled={product.stock === 0}
+                  disabled={product.stock === 0 || isAddingToCart}
                 >
                   {[...Array(maxQuantity)].map((_, i) => (
                     <option key={i + 1} value={i + 1}>{i + 1}</option>
@@ -103,14 +141,18 @@ export function DetailedProduct({ product }: DetailedProductProps) {
               <div className="flex-1">
                 <button
                   onClick={handleAddToCart}
-                  disabled={product.stock === 0}
+                  disabled={product.stock === 0 || isAddingToCart}
                   className={`w-full py-3 px-4 rounded-md font-medium text-white ${
-                    product.stock > 0
+                    product.stock > 0 && !isAddingToCart
                       ? "bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                       : "bg-gray-400 cursor-not-allowed"
                   }`}
                 >
-                  {product.stock > 0 ? "Add to Cart" : "Out of Stock"}
+                  {isAddingToCart 
+                    ? "Adding to Cart..." 
+                    : product.stock > 0 
+                      ? "Add to Cart" 
+                      : "Out of Stock"}
                 </button>
               </div>
             </div>

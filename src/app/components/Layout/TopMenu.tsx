@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 type Any = any;
 
 // Debounce function to limit how often a function can be called
@@ -77,7 +76,7 @@ export function TopMenu({ query }: { query?: string }) {
           {/* Logo */}
           <div className="flex-shrink-0">
             <Link href="/" className="text-xl font-bold text-blue-600">
-              Random Junk
+              Oddities
             </Link>
           </div>
 
