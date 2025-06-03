@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       });
     }
     
-    // Check if product exists and has enough stock
+    // Check if product exists and get stock information
     const product = await prisma.product.findUnique({
       where: {
         id: productId,
@@ -45,14 +45,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Product not found" }, { status: 404 });
     }
     
-    // Check if there's enough stock
-    if (quantity > product.stock) {
-      return NextResponse.json({ 
-        error: `Only ${product.stock} items available in stock`,
-        availableStock: product.stock
-      }, { status: 400 });
-    }
-    
     // Check if product is already in cart
     const existingCartItem = await prisma.cartItem.findFirst({
       where: {
@@ -61,42 +53,76 @@ export async function POST(request: NextRequest) {
       },
     });
     
+    // Handle new item creation or updating existing item
+    let adjustedQuantity: number;
+    let message: string | null = null;
+    
     if (existingCartItem) {
-      // Calculate the new total quantity
-      const newTotalQuantity = existingCartItem.quantity + quantity;
+      // Calculate total quantity after adding
+      let newTotalQuantity = existingCartItem.quantity + quantity;
       
-      // Check if new total exceeds stock
+      // Adjust quantity if it exceeds stock
       if (newTotalQuantity > product.stock) {
-        return NextResponse.json({ 
-          error: `Cannot add ${quantity} more units. You already have ${existingCartItem.quantity} in your cart and only ${product.stock} are available.`,
-          availableStock: product.stock,
-          currentInCart: existingCartItem.quantity
-        }, { status: 400 });
+        const originalRequested = newTotalQuantity;
+        newTotalQuantity = product.stock;
+        message = `We've adjusted your cart to the maximum available quantity (${product.stock})`;
       }
       
-      // Update quantity if product already in cart
-      const updatedCartItem = await prisma.cartItem.update({
-        where: {
-          id: existingCartItem.id,
-        },
+      // Only update if the quantity is different
+      if (newTotalQuantity !== existingCartItem.quantity) {
+        // Update quantity if product already in cart
+        const updatedCartItem = await prisma.cartItem.update({
+          where: {
+            id: existingCartItem.id,
+          },
+          data: {
+            quantity: newTotalQuantity,
+          },
+          include: {
+            product: true,
+          },
+        });
+        
+        return NextResponse.json({
+          cartItem: updatedCartItem,
+          adjusted: message !== null,
+          message: message,
+        });
+      } else {
+        // No change needed
+        return NextResponse.json({
+          cartItem: existingCartItem,
+          adjusted: false,
+          message: "Item already in cart with this quantity",
+        });
+      }
+    } else {
+      // For new cart items, adjust quantity if needed
+      adjustedQuantity = quantity;
+      
+      if (adjustedQuantity > product.stock) {
+        adjustedQuantity = product.stock;
+        message = `We've adjusted your cart to the maximum available quantity (${product.stock})`;
+      }
+      
+      // Add new item to cart with adjusted quantity
+      const cartItem = await prisma.cartItem.create({
         data: {
-          quantity: newTotalQuantity,
+          cartId: cart.id,
+          productId,
+          quantity: adjustedQuantity,
+        },
+        include: {
+          product: true,
         },
       });
       
-      return NextResponse.json(updatedCartItem);
+      return NextResponse.json({
+        cartItem: cartItem,
+        adjusted: message !== null,
+        message: message,
+      });
     }
-    
-    // Add new item to cart
-    const cartItem = await prisma.cartItem.create({
-      data: {
-        cartId: cart.id,
-        productId,
-        quantity,
-      },
-    });
-    
-    return NextResponse.json(cartItem);
   } catch (error) {
     console.error("Error adding item to cart:", error);
     return NextResponse.json({ error: "Failed to add item to cart" }, { status: 500 });

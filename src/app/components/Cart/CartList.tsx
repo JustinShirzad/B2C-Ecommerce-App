@@ -15,6 +15,7 @@ interface CartWithItems extends Cart {
       price: number;
       imageUrl: string | null;
       description: string;
+      stock: number;
     };
   }>;
 }
@@ -27,7 +28,7 @@ interface CartListProps {
 export function CartList({ cart, cartTotal }: CartListProps) {
   const router = useRouter();
   const [isProcessing, setIsProcessing] = useState(false);
-  
+
   if (cart.items.length === 0) {
     return (
       <div>
@@ -38,10 +39,10 @@ export function CartList({ cart, cartTotal }: CartListProps) {
       </div>
     );
   }
-  
+
   const handleCheckout = async () => {
     setIsProcessing(true);
-    
+
     try {
       const response = await fetch('/api/checkout', {
         method: 'POST',
@@ -50,7 +51,7 @@ export function CartList({ cart, cartTotal }: CartListProps) {
         },
         body: JSON.stringify({ cartId: cart.id }),
       });
-      
+
       if (response.ok) {
         const data = await response.json();
         router.push(`/checkout/success?orderId=${data.orderId}`);
@@ -71,17 +72,17 @@ export function CartList({ cart, cartTotal }: CartListProps) {
           <ul className="divide-y divide-gray-200">
             {cart.items.map((item) => (
               <li key={item.id}>
-                <CartListItem item={item} cartId={cart.id} />
+                <CartListItem item={item} />
               </li>
             ))}
           </ul>
         </div>
       </div>
-      
+
       <div className="lg:w-1/4">
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
           <h2 className="text-lg font-medium mb-4">Order Summary</h2>
-          
+
           <div className="space-y-2 mb-4">
             <div className="flex justify-between">
               <span className="text-gray-600">Subtotal</span>
@@ -96,7 +97,7 @@ export function CartList({ cart, cartTotal }: CartListProps) {
               <span>${cartTotal.toFixed(2)}</span>
             </div>
           </div>
-          
+
           <button
             onClick={handleCheckout}
             disabled={isProcessing}

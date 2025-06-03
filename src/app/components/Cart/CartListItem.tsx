@@ -1,7 +1,7 @@
 'use client';
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 
 interface CartItemProps {
@@ -14,9 +14,9 @@ interface CartItemProps {
       price: number;
       imageUrl: string | null;
       description: string;
+      stock: number; // Added stock to interface
     };
   };
-  cartId: string;
 }
 
 export function CartListItem({ item }: CartItemProps) {
@@ -24,9 +24,26 @@ export function CartListItem({ item }: CartItemProps) {
   const [quantity, setQuantity] = useState(item.quantity);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [stockWarning, setStockWarning] = useState<string | null>(null);
+  
+  // Ensure quantity doesn't exceed stock on initial load
+  useEffect(() => {
+    if (item.quantity > item.product.stock) {
+      handleQuantityChange(item.product.stock);
+      setStockWarning(`Quantity adjusted to match available stock (${item.product.stock})`);
+    }
+  }, [item.product.stock]);
   
   const handleQuantityChange = async (newQuantity: number) => {
-    if (newQuantity < 1 || newQuantity > 99) return;
+    if (newQuantity < 1) return;
+    // Enforce stock limit
+    if (newQuantity > item.product.stock) {
+      setStockWarning(`Only ${item.product.stock} items available in stock`);
+      newQuantity = item.product.stock;
+    } else {
+      setStockWarning(null);
+    }
+    
     if (newQuantity === quantity) return;
     
     setIsUpdating(true);
@@ -42,7 +59,13 @@ export function CartListItem({ item }: CartItemProps) {
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update item quantity');
+        const errorData = await response.json();
+        if (errorData.availableStock) {
+          setStockWarning(`Only ${errorData.availableStock} items available in stock`);
+          setQuantity(errorData.availableStock);
+          return;
+        }
+        throw new Error(errorData.error || 'Failed to update item quantity');
       }
       
       router.refresh();
@@ -96,6 +119,26 @@ export function CartListItem({ item }: CartItemProps) {
           {item.product.name}
         </Link>
         <p className="text-gray-600 text-base mt-2">{item.product.description}</p>
+        
+        {/* Stock information display */}
+        <div className="mt-1 mb-2">
+          {item.product.stock < 5 ? (
+            <p className="text-sm text-orange-600">
+              Only {item.product.stock} left in stock
+            </p>
+          ) : (
+            <p className="text-sm text-green-600">
+              In stock ({item.product.stock} available)
+            </p>
+          )}
+          
+          {stockWarning && (
+            <p className="text-sm text-red-600 mt-1">
+              {stockWarning}
+            </p>
+          )}
+        </div>
+        
         <div className="flex items-center justify-between mt-4">
           <div className="flex items-center">
             <button
@@ -109,7 +152,7 @@ export function CartListItem({ item }: CartItemProps) {
             <input
               type="number"
               min="1"
-              max="99"
+              max={item.product.stock}
               value={quantity}
               onChange={(e) => handleQuantityChange(Number(e.target.value))}
               className="w-16 h-10 mx-2 text-center border border-gray-300 rounded-md"
@@ -117,7 +160,7 @@ export function CartListItem({ item }: CartItemProps) {
             />
             <button
               onClick={() => handleQuantityChange(quantity + 1)}
-              disabled={isUpdating || quantity >= 99}
+              disabled={isUpdating || quantity >= item.product.stock}
               className="w-10 h-10 rounded-md border border-gray-300 flex items-center justify-center hover:bg-gray-100 disabled:opacity-50"
               aria-label="Increase quantity"
             >
