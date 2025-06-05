@@ -40,29 +40,10 @@ export function CartList({ cart, cartTotal }: CartListProps) {
     );
   }
 
-  const handleCheckout = async () => {
+  // Simply navigate to the checkout page - no API calls
+  const handleProceedToCheckout = () => {
     setIsProcessing(true);
-
-    try {
-      const response = await fetch('/api/checkout', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ cartId: cart.id }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        router.push(`/checkout/success?orderId=${data.orderId}`);
-      } else {
-        throw new Error('Checkout failed');
-      }
-    } catch (error) {
-      console.error('Error during checkout:', error);
-      setIsProcessing(false);
-      alert('There was a problem with checkout. Please try again.');
-    }
+    router.push('/checkout');
   };
 
   return (
@@ -99,7 +80,7 @@ export function CartList({ cart, cartTotal }: CartListProps) {
           </div>
 
           <button
-            onClick={handleCheckout}
+            onClick={handleProceedToCheckout}
             disabled={isProcessing}
             className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
           >
