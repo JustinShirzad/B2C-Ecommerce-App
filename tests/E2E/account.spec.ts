@@ -34,9 +34,9 @@ test.describe('Account Management E2E Tests', () => {
         await page.getByRole('textbox', { name: 'Email Address' }).click();
         await page.getByRole('textbox', { name: 'Email Address' }).fill('hi@gmail.com');
         await page.getByRole('textbox', { name: 'Password', exact: true }).click();
-        await page.getByRole('textbox', { name: 'Password', exact: true }).fill('password123');
+        await page.getByRole('textbox', { name: 'Password', exact: true }).fill('Password123.');
         await page.getByRole('textbox', { name: 'Confirm Password' }).click();
-        await page.getByRole('textbox', { name: 'Confirm Password' }).fill('password123');
+        await page.getByRole('textbox', { name: 'Confirm Password' }).fill('Password123.');
 
         // Submit the registration form
         await expect(page.getByRole('heading')).toContainText('Create an Account');
