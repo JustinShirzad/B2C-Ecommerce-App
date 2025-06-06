@@ -1,7 +1,8 @@
 import { ReactNode } from "react";
 import { TopMenu } from "./TopMenu";
-import { LeftMenu } from "./LeftMenu";
+import { Sidebar } from "./Sidebar";
 import { PrismaClient } from "@prisma/client";
+import { Footer } from "./Footer";
 
 const prisma = new PrismaClient();
 
@@ -24,7 +25,7 @@ export async function AppLayout({ children }: { children: ReactNode }) {
         <div className="container mx-auto px-4 py-8">
           <div className="flex flex-col md:flex-row gap-8">
             <div className="md:w-64 w-full">
-              <LeftMenu categories={categories} />
+              <Sidebar categories={categories} />
             </div>
             <main className="flex-1">
               {children}
@@ -32,6 +33,7 @@ export async function AppLayout({ children }: { children: ReactNode }) {
           </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

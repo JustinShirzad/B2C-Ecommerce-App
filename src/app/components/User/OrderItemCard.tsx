@@ -17,7 +17,7 @@ export function OrderItemCard({ orderItem }: OrderItemCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
 
   return (
-    <div className="p-4">
+    <div data-testid="order-item-card" className="p-4">
       <div className="flex flex-col space-y-2">
         {/* Main Info: Product Name, Quantity, Price */}
         <div className="flex justify-between items-center">

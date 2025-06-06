@@ -47,10 +47,22 @@ export async function POST(request: NextRequest) {
 
     const { password: _password, ...userWithoutPassword } = user;
 
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: 'User registered successfully', user: userWithoutPassword },
       { status: 201 }
     );
+
+    response.cookies.set({
+      name: 'user-id',
+      value: user.id,
+      httpOnly: true,
+      maxAge: 36000,
+      path: '/',
+      sameSite: 'lax'
+    });
+
+    return response;
+
   } catch (error) {
     console.error('Registration error:', error);
     return NextResponse.json(
