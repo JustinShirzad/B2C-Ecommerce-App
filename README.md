@@ -355,4 +355,5 @@ npm run test:e2e    # Run Playwright E2E tests
 npm run lint        # Run ESLint
 ```
 ---
-**Happy coding! 🚀**
+**Deploy at:** https://b2-c-ecommerce-cb90ma8nz-justinshirzads-projects.vercel.app/
+
