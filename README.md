@@ -105,10 +105,6 @@ The seeded database includes these test accounts:
 
 ## 📚 API Documentation
 
-### Base URLs
-- **Customer API**: `http://localhost:3000/api`
-- **Admin API**: `http://localhost:3001/api`
-
 ### Authentication
 The API uses cookie-based authentication:
 - `user-id`: Simple user identifier
@@ -301,11 +297,7 @@ npx playwright install
 # Run all E2E tests
 npm run test:e2e
 
-# Run specific test file
-npx playwright test tests/E2E/order.spec.ts
-
-# Run tests in UI mode
-npx playwright test --ui
+_# Note: Tests typically fail unless they are run 1 by 1. _
 ```
 
 ### Test Coverage
@@ -316,7 +308,6 @@ npx playwright test --ui
 - User account management
 
 ## 📁 Project Structure
-
 ```
 B2C-Ecommerce-App/
 ├── src/
@@ -346,15 +337,6 @@ B2C-Ecommerce-App/
 │   └── E2E/                       # Playwright E2E tests
 └── public/                        # Static assets
 ```
-
-## 🔒 Security Features
-
-- **Password Hashing**: bcryptjs with 12 salt rounds
-- **HttpOnly Cookies**: Secure session management
-- **Input Validation**: Server-side validation for all endpoints  
-- **Admin Authorization**: Protected admin routes and APIs
-- **SQL Injection Protection**: Prisma ORM parameterized queries
-- **XSS Protection**: React's built-in escaping
 
 ## 🚀 Deployment
 
@@ -400,37 +382,5 @@ npm run start:admin # Start production admin server
 npm run test:e2e    # Run Playwright E2E tests
 npm run lint        # Run ESLint
 ```
-
-## 📊 Database Commands
-
-```bash
-npx prisma studio          # Open database browser
-npx prisma migrate dev     # Create and apply new migration
-npx prisma migrate reset   # Reset database and apply all migrations
-npx prisma db seed         # Seed database with sample data
-npx prisma generate        # Generate Prisma client
-```
-
-## 🐛 Common Issues
-
-### Port Already in Use
-```bash
-# Kill process on specific port (Windows)
-netstat -ano | findstr :3001
-taskkill /PID <PID> /F
-
-# Kill process on specific port (macOS/Linux)  
-lsof -ti:3001 | xargs kill -9
-```
-
-### Database Issues
-```bash
-# Reset database
-npx prisma migrate reset
-
-# Regenerate client
-npx prisma generate
-```
 ---
-
 **Happy coding! 🚀**
