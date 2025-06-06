@@ -22,7 +22,7 @@ export function OrderListItem({ order }: OrderListItemProps) {
   const orderDateISO = order.createdAt.toISOString().split('T')[0];
   
   return (
-    <div className="border rounded-lg bg-white shadow-md">
+    <div data-testid="order-item" className="border rounded-lg bg-white shadow-md">
       {/* Order Header */}
       <div className="p-4 border-b border-gray-200">
         <div className="flex justify-between items-center">
