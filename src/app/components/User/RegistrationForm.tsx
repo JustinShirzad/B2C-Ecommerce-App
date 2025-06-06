@@ -27,6 +27,18 @@ export function RegistrationForm() {
       setError('Password must be at least 8 characters long');
       return;
     }
+
+    // Check for uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      setError('Password must contain at least 1 uppercase letter');
+      return;
+    }
+
+    // Check for special character
+    if (!/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+      setError('Password must contain at least 1 special character (!@#$%^&*(),.?":{}|<>)');
+      return;
+    }
     
     setLoading(true);
 
@@ -104,7 +116,14 @@ export function RegistrationForm() {
             required
             minLength={8}
           />
-          <p className="mt-1 text-xs text-gray-500">Must be at least 8 characters long</p>
+          <div className="mt-1 text-xs text-gray-500">
+            <p>Must contain:</p>
+            <ul className="list-disc list-inside">
+              <li>At least 8 characters</li>
+              <li>At least 1 uppercase letter (A-Z)</li>
+              <li>At least 1 special character (!@#$%^&*(),.?":{}|&lt;&gt;)</li>
+            </ul>
+          </div>
         </div>
         
         <div className="mb-6">

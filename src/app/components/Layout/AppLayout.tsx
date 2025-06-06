@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import { TopMenu } from "./TopMenu";
-import { Sidebar } from "./Sidebar";
+import { Sidebar } from "./SideBar";
 import { PrismaClient } from "@prisma/client";
 import { Footer } from "./Footer";
 

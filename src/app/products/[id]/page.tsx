@@ -6,13 +6,13 @@ import { notFound } from "next/navigation";
 export default async function ProductPage({
   params
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-  const resolvedParams = await params;
+  const resolvedParams = await params; 
 
   const product = await prisma.product.findUnique({
     where: {
-      id: resolvedParams.id,
+      id: resolvedParams.id,  // ← Changed from params.id to resolvedParams.id
     },
   });
 
