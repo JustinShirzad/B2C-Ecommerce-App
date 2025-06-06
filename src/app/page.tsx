@@ -7,7 +7,7 @@ import ProductBanner from "./components/Layout/Banner";
 export default async function Page({
   searchParams
 }: {
-  searchParams: { sort?: string }
+  searchParams: Promise<{ sort?: string }>
 }) {
   const { sort } = await (searchParams);
   const orderBy = await (getSortConfig(sort || 'name-asc'));

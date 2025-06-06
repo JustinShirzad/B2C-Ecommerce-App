@@ -7,7 +7,8 @@ import ProductBanner from "../components/Layout/Banner";
 export default async function SearchPage({
     searchParams
 }: {
-    searchParams: { q?: string; sort?: string }
+    searchParams: Promise<{ q?: string; sort?: string }>  // ← Changed from { q?: string; sort?: string }
+
 }) {
     const { q: query = "", sort } = await (searchParams);
     const orderBy = await (getSortConfig(sort || 'name-asc'));
@@ -24,17 +25,17 @@ export default async function SearchPage({
     });
 
     const featuredProducts = await prisma.product.findMany({
-    where: {
-      stock: {
-        gt: 0 // Only show products that are in stock
-      }
-    },
-    orderBy: [
-      { category: 'asc' },
-      { createdAt: 'desc' }
-    ],
-    take: 5 // Show 5 featured products in rotation
-  });
+        where: {
+            stock: {
+                gt: 0 // Only show products that are in stock
+            }
+        },
+        orderBy: [
+            { category: 'asc' },
+            { createdAt: 'desc' }
+        ],
+        take: 5 // Show 5 featured products in rotation
+    });
 
     return (
         <AppLayout>
