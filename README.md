@@ -259,28 +259,6 @@ Creates order from cart items.
 
 ---
 
-## 👑 Admin API Endpoints
-
-### Get Dashboard Statistics
-```http
-GET /api/admin/stats
-```
-**Authentication**: Admin required
-
-Returns dashboard metrics including revenue, order counts, and low stock alerts.
-
-### Product Management
-```http
-POST /api/admin/products     # Create product
-PUT /api/admin/products/{id} # Update product  
-DELETE /api/admin/products/{id} # Delete product
-```
-**Authentication**: Admin required
-
-Full CRUD operations for product catalog management.
-
----
-
 ## 🎯 Testing
 
 ### E2E Testing with Playwright
