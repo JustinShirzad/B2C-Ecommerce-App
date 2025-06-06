@@ -8,8 +8,8 @@ export default async function SearchPage({
 }: {
     searchParams: { q?: string; sort?: string }
 }) {
-    const { q: query = "", sort } = await searchParams;
-    const orderBy = getSortConfig(sort || 'name-asc');
+    const { q: query = "", sort } = await (searchParams);
+    const orderBy = await (getSortConfig(sort || 'name-asc'));
 
     const products = await prisma.product.findMany({
         where: query ? {

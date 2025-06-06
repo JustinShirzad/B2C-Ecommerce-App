@@ -12,4 +12,8 @@ test('test', async ({ page }) => {
 
   await page.getByRole('link', { name: 'Cart' }).click();
   await page.getByRole('link', { name: 'Test User' }).click();
+
+
+
+  await page.goto('http://localhost:3000/');
 });

@@ -11,8 +11,8 @@ export default async function Page({
     params: { name: string }
     searchParams: { sort?: string }
 }) {
-    const categoryName = params.name;
-    const orderBy = getSortConfig(sort || 'name-asc');
+    const categoryName = await (params.name);
+    const orderBy = await (getSortConfig(sort || 'name-asc'));
 
     const products = await prisma.product.findMany({
         where: {
