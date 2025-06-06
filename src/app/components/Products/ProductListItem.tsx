@@ -9,7 +9,7 @@ interface ProductListItemProps {
 
 export function ProductListItem({ product }: ProductListItemProps) {
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+    <div data-testid="product-item" className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
       <Link href={`/products/${product.id}`} className="block h-48 overflow-hidden">
         <img
           src={product.imageUrl || '/placeholder-product.png'}

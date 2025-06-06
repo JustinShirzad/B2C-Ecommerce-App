@@ -109,7 +109,7 @@ async function main() {
         description: 'A strong and sturdy femur bone, the perfect weapon.',
         price: 157.4,
         imageUrl: 'https://plus.unsplash.com/premium_photo-1722867780455-13cfcefd1138?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NXx8ZmVtdXJ8ZW58MHx8MHx8fDA%3D',
-        category: 'Photography',
+        category: 'Anatomy',
         stock: 1,
       },
     }),

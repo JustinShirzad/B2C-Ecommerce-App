@@ -1,46 +1,30 @@
 import { AppLayout } from "../components/Layout/AppLayout";
 import { Main } from "../components/Main";
 import { prisma } from "@/lib/prisma";
+import { getSortConfig } from "@/lib/sort";
 
-export default async function Page({
+export default async function SearchPage({
     searchParams
 }: {
-    searchParams: { q?: string }
+    searchParams: { q?: string; sort?: string }
 }) {
-    const resolvedParams = await searchParams;
-    const query = resolvedParams.q || "";
-    
+    const { q: query = "", sort } = await searchParams;
+    const orderBy = getSortConfig(sort || 'name-asc');
+
     const products = await prisma.product.findMany({
-        where: {
+        where: query ? {
             OR: [
-                {
-                    name: {
-                        contains: query,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    description: {
-                        contains: query,
-                        mode: 'insensitive'
-                    }
-                },
-                {
-                    category: {
-                        contains: query,
-                        mode: 'insensitive'
-                    }
-                }
+                { name: { contains: query } },
+                { description: { contains: query } },
+                { category: { contains: query } }
             ]
-        },
-        orderBy: {
-            createdAt: 'desc'
-        }
+        } : {},
+        orderBy
     });
 
     return (
         <AppLayout>
-            <Main product={products}/>
+            <Main product={products} />
         </AppLayout>
     );
 }
