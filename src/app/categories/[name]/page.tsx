@@ -3,6 +3,7 @@ import { AppLayout } from "../../components/Layout/AppLayout";
 import { prisma } from "@/lib/prisma";
 import { getSortConfig } from "@/lib/sort";
 import { notFound } from "next/navigation";
+import ProductBanner from "../../components/Layout/Banner";
 
 export default async function Page({
     params,
@@ -21,12 +22,26 @@ export default async function Page({
         orderBy
     });
 
+    const featuredProducts = await prisma.product.findMany({
+    where: {
+      stock: {
+        gt: 0 // Only show products that are in stock
+      }
+    },
+    orderBy: [
+      { category: 'asc' },
+      { createdAt: 'desc' }
+    ],
+    take: 5 // Show 5 featured products in rotation
+  });
+
     if (products.length === 0) {
         notFound();
     }
 
     return (
         <AppLayout>
+            <ProductBanner products={featuredProducts} />
             <Main product={products} />
         </AppLayout>
     );
