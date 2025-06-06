@@ -43,7 +43,8 @@ export function RegistrationForm() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      router.push('/account');
+      router.refresh();
+      router.push('/');
     } catch (error: any) {
       setError(error.message);
     } finally {

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 const prisma = new PrismaClient();
 
-async function main() {
+export async function seedData() {
   // Clear existing data
   await prisma.orderItem.deleteMany();
   await prisma.order.deleteMany();
@@ -15,6 +15,7 @@ async function main() {
   const products = await Promise.all([
     prisma.product.create({
       data: {
+        id: 'wireless-headphones',
         name: 'Wireless Headphones',
         description: 'High-quality wireless headphones with noise cancellation.',
         price: 99.99,
@@ -25,6 +26,7 @@ async function main() {
     }),
     prisma.product.create({
       data: {
+        id: 'smart-watch',
         name: 'Smart Watch',
         description: 'Track your fitness and stay connected.',
         price: 199.99,
@@ -35,6 +37,7 @@ async function main() {
     }),
     prisma.product.create({
       data: {
+        id: 'cotton-t-shirt',
         name: 'Cotton T-Shirt',
         description: 'Comfortable 100% cotton t-shirt.',
         price: 24.99,
@@ -45,6 +48,7 @@ async function main() {
     }),
     prisma.product.create({
       data: {
+        id: 'js-book',
         name: 'JavaScript Book',
         description: 'Learn modern JavaScript programming.',
         price: 39.99,
@@ -155,7 +159,7 @@ async function main() {
 
   const admin = await prisma.user.create({
     data: {
-      id: 'test-admin-id',
+      id: 'admin-user-id',
       email: 'admin@example.com',
       name: 'Admin User',
       password: hashedAdminPassword,
@@ -220,18 +224,4 @@ async function main() {
   });
 
   console.log(`Database has been seeded. 🌱`);
-  console.log(`Created ${products.length} products`);
-  console.log(`Created users: ${user.email} (regular) and ${admin.email} (admin)`);
-  console.log(`Created ${2} orders for the test user:`);
-  console.log(` - Order #1: ${singleItemOrder.id} (1 item, total: $${singleItemOrder.total})`);
-  console.log(` - Order #2: ${multiItemOrder.id} (6 items, total: $${multiItemOrder.total})`);
 }
-
-main()
-  .catch((e) => {
-    console.error(e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
