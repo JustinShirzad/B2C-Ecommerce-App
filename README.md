@@ -67,14 +67,8 @@ NODE_ENV="development"
 npm run dev
 ```
 
-**Admin panel** (Port 3001):
-```bash
-npm run dev:admin
-```
-
 Open your browser:
 - **Customer Site**: [http://localhost:3000](http://localhost:3000)
-- **Admin Panel**: [http://localhost:3001](http://localhost:3001)
 
 ## 👥 Default Users
 
