@@ -1,36 +1,436 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# B2C Ecommerce Application
 
-## Getting Started
+A full-stack ecommerce application built with Next.js, featuring both customer-facing storefront and admin management panel.
 
-First, run the development server:
+## 🚀 Features
 
+### Customer Features
+- **Product Browsing**: Browse products by category with search functionality
+- **Shopping Cart**: Add, update, and remove items from cart
+- **User Authentication**: Secure registration and login system
+- **Order Management**: Place orders and view order history
+- **Responsive Design**: Mobile-friendly interface
+
+### Admin Features
+- **Admin Dashboard**: Statistics overview with revenue, orders, and product metrics
+- **Product Management**: Full CRUD operations for products
+- **Order Management**: View and manage customer orders
+- **User Management**: View registered users
+- **Separate Admin Panel**: Runs on dedicated port (3001)
+
+## 🛠 Tech Stack
+
+- **Frontend**: Next.js 14 (App Router), React, TypeScript, Tailwind CSS
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: SQLite (development), PostgreSQL (production ready)
+- **Authentication**: Cookie-based sessions with bcryptjs password hashing
+- **Testing**: Playwright E2E tests
+- **Documentation**: Swagger/OpenAPI annotations
+
+## 📋 Prerequisites
+
+- Node.js 18+ 
+- npm or yarn package manager
+
+## 🚀 Getting Started
+
+### 1. Clone and Install
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <repository-url>
+cd B2C-Ecommerce-App
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Database Setup
+```bash
+# Generate Prisma client
+npx prisma generate
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+# Run database migrations
+npx prisma migrate dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Seed the database with sample data
+npx prisma db seed
+```
 
-## Learn More
+### 3. Environment Setup
+Create a `.env` file in the root directory:
+```env
+DATABASE_URL="file:./dev.db"
+NODE_ENV="development"
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 4. Start Development Servers
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**Customer-facing application** (Port 3000):
+```bash
+npm run dev
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+**Admin panel** (Port 3001):
+```bash
+npm run dev:admin
+```
 
-## Deploy on Vercel
+Open your browser:
+- **Customer Site**: [http://localhost:3000](http://localhost:3000)
+- **Admin Panel**: [http://localhost:3001](http://localhost:3001)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 👥 Default Users
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The seeded database includes these test accounts:
+
+### Customer Account
+- **Email**: user@example.com
+- **Password**: password123
+
+### Admin Account  
+- **Email**: admin@example.com
+- **Password**: adminpassword
+
+## 🗄 Database Schema
+
+### Core Entities
+- **Users**: Customer and admin user accounts
+- **Products**: Product catalog with categories, pricing, and inventory
+- **Cart**: Shopping cart with items
+- **Orders**: Customer orders with items and shipping information
+
+### Relationships
+- Users have Carts (1:1)
+- Carts have CartItems (1:N)
+- Users have Orders (1:N) 
+- Orders have OrderItems (1:N)
+- Products can be in CartItems and OrderItems (1:N)
+
+## 📚 API Documentation
+
+### Base URLs
+- **Customer API**: `http://localhost:3000/api`
+- **Admin API**: `http://localhost:3001/api`
+
+### Authentication
+The API uses cookie-based authentication:
+- `user-id`: Simple user identifier
+- `session`: JSON session data for admin authentication
+
+---
+
+## 🔐 Authentication Endpoints
+
+### Check Authentication Status
+```http
+GET /api/auth
+```
+Validates user session and returns authentication status.
+
+**Response (200)**:
+```json
+{
+  "authenticated": true,
+  "user": {
+    "id": "string",
+    "name": "string", 
+    "email": "string",
+    "isAdmin": boolean
+  }
+}
+```
+
+### User Login
+```http
+POST /api/auth/login
+```
+Authenticates user with email and password.
+
+**Request**:
+```json
+{
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200)**:
+```json
+{
+  "message": "Login successful",
+  "user": { "id": "...", "name": "...", "email": "...", "isAdmin": false }
+}
+```
+
+### User Registration
+```http
+POST /api/auth/register
+```
+Creates new user account.
+
+**Request**:
+```json
+{
+  "name": "John Doe",
+  "email": "john@example.com", 
+  "password": "password123"
+}
+```
+
+### User Logout
+```http
+POST /api/auth/logout
+```
+Clears user session cookies.
+
+---
+
+## 🛒 Cart Management Endpoints
+
+### Add Item to Cart
+```http
+POST /api/cart/items
+```
+**Authentication**: Required
+
+**Request**:
+```json
+{
+  "productId": "wireless-headphones",
+  "quantity": 2
+}
+```
+
+**Response**:
+```json
+{
+  "cartItem": {
+    "id": "string",
+    "quantity": 2,
+    "product": { "id": "...", "name": "...", "price": 99.99 }
+  }
+}
+```
+
+### Get Cart Items
+```http
+GET /api/cart/items
+```
+**Authentication**: Required
+
+Returns all items in user's cart.
+
+### Update Cart Item
+```http
+PATCH /api/cart/items/{id}
+```
+**Authentication**: Required
+
+Updates quantity of specific cart item.
+
+### Remove Cart Item
+```http
+DELETE /api/cart/items/{id}
+```
+**Authentication**: Required
+
+Removes item from cart.
+
+---
+
+## 📦 Order Management Endpoints
+
+### Process Checkout
+```http
+POST /api/checkout
+```
+**Authentication**: Required
+
+Creates order from cart items.
+
+**Request**:
+```json
+{
+  "shippingInfo": {
+    "address": "123 Main Street",
+    "city": "New York",
+    "zipCode": "10001"
+  },
+  "paymentMethod": "credit_card"
+}
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "orderId": "string",
+  "orderNumber": "ORD-ABC12345",
+  "totalAmount": 299.99
+}
+```
+
+---
+
+## 👑 Admin API Endpoints
+
+### Get Dashboard Statistics
+```http
+GET /api/admin/stats
+```
+**Authentication**: Admin required
+
+Returns dashboard metrics including revenue, order counts, and low stock alerts.
+
+### Product Management
+```http
+POST /api/admin/products     # Create product
+PUT /api/admin/products/{id} # Update product  
+DELETE /api/admin/products/{id} # Delete product
+```
+**Authentication**: Admin required
+
+Full CRUD operations for product catalog management.
+
+---
+
+## 🎯 Testing
+
+### E2E Testing with Playwright
+```bash
+# Install Playwright browsers
+npx playwright install
+
+# Run all E2E tests
+npm run test:e2e
+
+# Run specific test file
+npx playwright test tests/E2E/order.spec.ts
+
+# Run tests in UI mode
+npx playwright test --ui
+```
+
+### Test Coverage
+- Authentication flows (login, register, logout)
+- Cart operations (add, update, remove items)
+- Checkout process and order creation
+- Admin product management
+- User account management
+
+## 📁 Project Structure
+
+```
+B2C-Ecommerce-App/
+├── src/
+│   ├── app/
+│   │   ├── admin/                 # Admin panel pages
+│   │   │   ├── layout.tsx         # Admin layout
+│   │   │   ├── page.tsx           # Admin dashboard
+│   │   │   ├── products/          # Product management
+│   │   │   └── orders/            # Order management
+│   │   ├── api/                   # API routes
+│   │   │   ├── auth/              # Authentication endpoints
+│   │   │   ├── cart/              # Cart management
+│   │   │   ├── checkout/          # Order processing
+│   │   │   └── admin/             # Admin-only endpoints
+│   │   ├── account/               # User account pages
+│   │   ├── cart/                  # Shopping cart page
+│   │   ├── components/            # Reusable components
+│   │   │   ├── Admin/             # Admin-specific components
+│   │   │   └── User/              # Customer components
+│   │   └── globals.css            # Global styles
+│   └── lib/                       # Utilities and configurations
+├── prisma/
+│   ├── schema.prisma              # Database schema
+│   ├── seed.ts                    # Database seeding
+│   └── migrations/                # Database migrations
+├── tests/
+│   └── E2E/                       # Playwright E2E tests
+└── public/                        # Static assets
+```
+
+## 🔒 Security Features
+
+- **Password Hashing**: bcryptjs with 12 salt rounds
+- **HttpOnly Cookies**: Secure session management
+- **Input Validation**: Server-side validation for all endpoints  
+- **Admin Authorization**: Protected admin routes and APIs
+- **SQL Injection Protection**: Prisma ORM parameterized queries
+- **XSS Protection**: React's built-in escaping
+
+## 🚀 Deployment
+
+### Database Migration
+```bash
+# Generate production client
+npx prisma generate
+
+# Deploy migrations
+npx prisma migrate deploy
+
+# Seed production database (optional)
+npx prisma db seed
+```
+
+### Environment Variables
+Set these environment variables for production:
+```env
+DATABASE_URL="postgresql://user:password@host:port/database"
+NODE_ENV="production"
+```
+
+### Build and Start
+```bash
+# Build the application
+npm run build
+
+# Start production server (customer site)
+npm run start
+
+# Start production admin panel
+npm run start:admin
+```
+
+## 🔧 Available Scripts
+
+```bash
+npm run dev         # Start customer development server (port 3000)
+npm run dev:admin   # Start admin development server (port 3001)
+npm run build       # Build for production
+npm run start       # Start production customer server
+npm run start:admin # Start production admin server
+npm run test:e2e    # Run Playwright E2E tests
+npm run lint        # Run ESLint
+```
+
+## 📊 Database Commands
+
+```bash
+npx prisma studio          # Open database browser
+npx prisma migrate dev     # Create and apply new migration
+npx prisma migrate reset   # Reset database and apply all migrations
+npx prisma db seed         # Seed database with sample data
+npx prisma generate        # Generate Prisma client
+```
+
+## 🐛 Common Issues
+
+### Port Already in Use
+```bash
+# Kill process on specific port (Windows)
+netstat -ano | findstr :3001
+taskkill /PID <PID> /F
+
+# Kill process on specific port (macOS/Linux)  
+lsof -ti:3001 | xargs kill -9
+```
+
+### Database Issues
+```bash
+# Reset database
+npx prisma migrate reset
+
+# Regenerate client
+npx prisma generate
+```
+---
+
+**Happy coding! 🚀**
